@@ -1,37 +1,37 @@
 use std::ops;
 
-pub struct Vector3(f32, f32, f32);
+pub struct Vector3(pub f32, pub f32, pub f32);
 
 impl Vector3 {
-    fn x(&self) -> f32 {
+    pub fn x(&self) -> f32 {
         self.0
     }
 
-    fn y(&self) -> f32 {
+    pub fn y(&self) -> f32 {
         self.1
     }
 
-    fn z(&self) -> f32 {
+    pub fn z(&self) -> f32 {
         self.2
     }
 
-    fn length(&self) -> f32 {
+    pub fn length(&self) -> f32 {
         self.squared().sqrt()
     }
 
-    fn out(&self) {
+    pub fn out(&self) {
         println!("{} {} {}", self.x(), self.y(), self.z());
     }
 
-    fn squared(&self) -> f32 {
+    pub fn squared(&self) -> f32 {
         (self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z())
     }
 
-    fn dot(&self, v: &Vector3) -> f32 {
+    pub fn dot(&self, v: &Vector3) -> f32 {
         (self.x() * v.x()) + (self.y() * v.y()) + (self.z() * v.z())
     }
 
-    fn cross(&self, v: &Vector3) -> Vector3 {
+    pub fn cross(&self, v: &Vector3) -> Vector3 {
         Vector3(
             self.y() * v.z() - self.z() * v.y(),
             self.z() * v.x() - self.x() * v.z(),
@@ -39,8 +39,8 @@ impl Vector3 {
         )
     }
 
-    fn unit_vector(v: Vector3) -> Vector3 {
-        let mut v_clone = Vector3(v.x(), v.y(), v.z());
+    pub fn unit_vector(v: Vector3) -> Vector3 {
+        let v_clone = Vector3(v.x(), v.y(), v.z());
         v_clone / v.length()
     }
 }
@@ -50,8 +50,7 @@ impl ops::Neg for Vector3 {
 
     fn neg(self) -> Self::Output {
         Vector3(-self.0, -self.1, -self.2)
-    }
-}
+    } }
 
 impl ops::Add<Vector3> for Vector3 {
     type Output = Vector3;
