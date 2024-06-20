@@ -19,6 +19,10 @@ impl Vector3 {
         self.squared().sqrt()
     }
 
+    fn out(&self) {
+        println!("{} {} {}", self.x(), self.y(), self.z());
+    }
+
     fn squared(&self) -> f32 {
         (self.x() * self.x()) + (self.y() * self.y()) + (self.z() * self.z())
     }

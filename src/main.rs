@@ -18,6 +18,7 @@ fn main() {
             let g: i32 = (255.999 * normalized_g) as i32;
             let b: i32 = (255.999 * normalized_b) as i32;
             print!("\n{} {} {}", r, g, b)
+            // TODO: 3.1
         }
     }
     eprintln!("Rendering finished!");
