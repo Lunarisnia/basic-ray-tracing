@@ -1,10 +1,15 @@
 use Vector3 as Color;
 
+use crate::hittable::{HitRecord, Hittable, HittableList};
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vector::Vector3;
 
 mod vector;
 mod ray;
+mod hittable;
+mod sphere;
+mod mathlib;
 
 fn write_color(color: Color) {
     let normalized_r: f32 = color.x();
@@ -31,11 +36,10 @@ fn hit_sphere(center: Vector3, radius: f32, ray: &Ray) -> f32 {
     };
 }
 
-fn ray_color(ray: &Ray) -> Color {
-    let t: f32 = hit_sphere(Vector3(0.0, 0.0, -1.0), 0.5, &ray);
-    if t > 0.0 {
-        let n: Vector3 = Vector3::unit_vector(ray.at(t) - Vector3(0.0, 0.0, -1.0));
-        return 0.5 * Color(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
+fn ray_color(ray: &Ray, world: &HittableList) -> Color {
+    let mut hit_record: HitRecord = HitRecord::new();
+    if world.hit(ray, 0.0, f32::INFINITY, &mut hit_record) {
+        return 0.5 * (hit_record.normal + Color(1.0, 1.0, 1.0));
     }
 
     let unit_direction: Vector3 = Vector3::unit_vector(ray.direction);
@@ -54,11 +58,17 @@ fn main() {
         image_height = 1
     }
 
+    let mut world: HittableList = HittableList::new();
+
+    world.add(Box::new(Sphere::new(0.5, &Vector3(0.0, 0.0, -1.0))));
+    world.add(Box::new(Sphere::new(100.0, &Vector3(0.0, -100.5, -1.0))));
+
     // Arbitrary viewport height
     let focal_length = 1.0;
     let viewport_height = 2.0;
     let viewport_width = viewport_height * (image_width as f32 / image_height as f32);
     let camera_center: Vector3 = Vector3(0.0, 0.0, 0.0);
+
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges.
     let viewport_u: Vector3 = Vector3(viewport_width, 0.0, 0.0);
@@ -83,7 +93,7 @@ fn main() {
             let ray_direction: Vector3 = pixel_center - &camera_center;
             let ray: Ray = Ray::new(&camera_center, &ray_direction);
 
-            let pixel_color: Color = ray_color(&ray);
+            let pixel_color: Color = ray_color(&ray, &world);
             write_color(pixel_color);
         }
     }

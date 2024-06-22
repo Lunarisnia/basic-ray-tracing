@@ -4,6 +4,10 @@ use std::ops;
 pub struct Vector3(pub f32, pub f32, pub f32);
 
 impl Vector3 {
+    pub fn zero() -> Vector3 {
+        Vector3(0.0, 0.0, 0.0)
+    }
+
     pub fn x(&self) -> f32 {
         self.0
     }
