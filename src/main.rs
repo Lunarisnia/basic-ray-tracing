@@ -18,20 +18,25 @@ fn write_color(color: Color) {
     println!("{} {} {}", r, g, b);
 }
 
-fn hit_sphere(center: Vector3, radius: f32, ray: &Ray) -> bool {
+fn hit_sphere(center: Vector3, radius: f32, ray: &Ray) -> f32 {
     let ray_center: Vector3 = center - ray.origin;
-    let a: f32 = ray.direction.dot(&ray.direction);
-    let b: f32 = -2.0 * ray.direction.dot(&ray_center);
-    let c: f32 = ray_center.dot(&ray_center) - radius * radius;
-    let discriminant: f32 = b*b - 4.0*a*c;
-    return discriminant >= 0.0;
+    let a: f32 = ray.direction.squared();
+    let h: f32 = ray.direction.dot(&ray_center);
+    let c: f32 = ray_center.squared() - radius * radius;
+    let discriminant: f32 = h * h - a * c;
+    return if discriminant < 0.0 {
+        -1.0
+    } else {
+        (h - discriminant.sqrt()) / a
+    };
 }
 
 fn ray_color(ray: &Ray) -> Color {
-    if hit_sphere(Vector3(0.0, 0.0, -1.0), 0.5, &ray) {
-        return Color(1.0, 0.0, 0.0);
+    let t: f32 = hit_sphere(Vector3(0.0, 0.0, -1.0), 0.5, &ray);
+    if t > 0.0 {
+        let n: Vector3 = Vector3::unit_vector(ray.at(t) - Vector3(0.0, 0.0, -1.0));
+        return 0.5 * Color(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
     }
-
 
     let unit_direction: Vector3 = Vector3::unit_vector(ray.direction);
     let a: f32 = 0.5 * (unit_direction.y() + 1.0);
