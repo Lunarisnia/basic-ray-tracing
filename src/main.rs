@@ -18,7 +18,21 @@ fn write_color(color: Color) {
     println!("{} {} {}", r, g, b);
 }
 
+fn hit_sphere(center: Vector3, radius: f32, ray: &Ray) -> bool {
+    let ray_center: Vector3 = center - ray.origin;
+    let a: f32 = ray.direction.dot(&ray.direction);
+    let b: f32 = -2.0 * ray.direction.dot(&ray_center);
+    let c: f32 = ray_center.dot(&ray_center) - radius * radius;
+    let discriminant: f32 = b*b - 4.0*a*c;
+    return discriminant >= 0.0;
+}
+
 fn ray_color(ray: &Ray) -> Color {
+    if hit_sphere(Vector3(0.0, 0.0, -1.0), 0.5, &ray) {
+        return Color(1.0, 0.0, 0.0);
+    }
+
+
     let unit_direction: Vector3 = Vector3::unit_vector(ray.direction);
     let a: f32 = 0.5 * (unit_direction.y() + 1.0);
     (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)
@@ -26,7 +40,7 @@ fn ray_color(ray: &Ray) -> Color {
 
 
 fn main() {
-    let aspect_ratio: f32 = 16.0/9.0;
+    let aspect_ratio: f32 = 16.0 / 9.0;
     let image_width: i32 = 400;
 
     // Calculate image height ensure it's at least 1
