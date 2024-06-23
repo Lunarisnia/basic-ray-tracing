@@ -10,6 +10,7 @@ mod ray;
 mod hittable;
 mod sphere;
 mod mathlib;
+mod interval;
 
 fn write_color(color: Color) {
     let normalized_r: f32 = color.x();
@@ -68,7 +69,6 @@ fn main() {
     let viewport_height = 2.0;
     let viewport_width = viewport_height * (image_width as f32 / image_height as f32);
     let camera_center: Vector3 = Vector3(0.0, 0.0, 0.0);
-
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges.
     let viewport_u: Vector3 = Vector3(viewport_width, 0.0, 0.0);
