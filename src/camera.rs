@@ -4,6 +4,7 @@ use crate::hittable::{HitRecord, Hittable, HittableList};
 use crate::interval::Interval;
 use crate::mathlib::random_zero_one;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vector::Vector3;
 
 pub struct Camera {
@@ -115,7 +116,9 @@ impl Camera {
     pub fn ray_color(&self, ray: &Ray, world: &HittableList) -> Color {
         let mut hit_record: HitRecord = HitRecord::new();
         if world.hit(ray, Interval::new(0.0, f32::INFINITY), &mut hit_record) {
-            return 0.5 * (hit_record.normal + Vector3(1.0, 1.0, 1.0));
+            let reflected_direction: Vector3 = Sphere::random_on_hemisphere(&hit_record.normal);
+            return 0.5 * self.ray_color(&Ray::new(&hit_record.position, &reflected_direction), &world);
+            // TODO: STOP HERE AND UNDERSTAND IT BEFORE PROCEEDING TO 9.2
         }
 
         let unit_direction: Vector3 = Vector3::unit_vector(ray.direction);

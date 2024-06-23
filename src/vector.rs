@@ -1,5 +1,7 @@
 use std::ops;
 
+use crate::mathlib;
+
 #[derive(Copy, Clone, Debug)]
 pub struct Vector3(pub f32, pub f32, pub f32);
 
@@ -26,6 +28,14 @@ impl Vector3 {
 
     pub fn out(&self) {
         println!("{} {} {}", self.x(), self.y(), self.z());
+    }
+
+    pub fn random() -> Vector3 {
+        Vector3(mathlib::random_zero_one(), mathlib::random_zero_one(), mathlib::random_zero_one())
+    }
+
+    pub fn random_range(min: f32, max: f32) -> Vector3 {
+        Vector3(mathlib::random_range(min, max), mathlib::random_range(min, max), mathlib::random_range(min, max))
     }
 
     pub fn squared(&self) -> f32 {
@@ -190,7 +200,7 @@ impl ops::Div<f32> for &Vector3 {
     type Output = Vector3;
 
     fn div(self, rhs: f32) -> Self::Output {
-        self * (1.0/rhs)
+        self * (1.0 / rhs)
     }
 }
 

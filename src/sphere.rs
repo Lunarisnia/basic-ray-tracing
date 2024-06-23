@@ -15,6 +15,28 @@ impl Sphere {
             center: Vector3(center.x(), center.y(), center.z()),
         }
     }
+
+    fn random_unit_in_sphere() -> Vector3 {
+        loop {
+            let rand: Vector3 = Vector3::random_range(-1.0, 1.0);
+            if rand.squared() < 1.0 {
+                return rand
+            }
+        }
+    }
+
+    fn random_unit_vector() -> Vector3 {
+        Vector3::unit_vector(Self::random_unit_in_sphere())
+    }
+
+    pub fn random_on_hemisphere(normal: &Vector3) -> Vector3 {
+        let on_unit_sphere: Vector3 = Self::random_unit_vector();
+        if on_unit_sphere.dot(normal) > 0.0 {
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
+        }
+    }
 }
 
 impl Hittable for Sphere {
@@ -46,4 +68,5 @@ impl Hittable for Sphere {
 
         true
     }
+
 }
