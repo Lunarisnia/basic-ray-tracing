@@ -1,7 +1,7 @@
 // double min, max;
 pub struct Interval {
-    min: f32,
-    max: f32,
+    pub min: f32,
+    pub max: f32,
 }
 
 impl Interval {

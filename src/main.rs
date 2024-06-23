@@ -1,6 +1,7 @@
 use Vector3 as Color;
 
 use crate::hittable::{HitRecord, Hittable, HittableList};
+use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vector::Vector3;
@@ -39,7 +40,7 @@ fn hit_sphere(center: Vector3, radius: f32, ray: &Ray) -> f32 {
 
 fn ray_color(ray: &Ray, world: &HittableList) -> Color {
     let mut hit_record: HitRecord = HitRecord::new();
-    if world.hit(ray, 0.0, f32::INFINITY, &mut hit_record) {
+    if world.hit(ray, Interval::new(0.0, f32::INFINITY), &mut hit_record) {
         return 0.5 * (hit_record.normal + Color(1.0, 1.0, 1.0));
     }
 

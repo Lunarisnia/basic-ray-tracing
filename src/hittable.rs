@@ -1,3 +1,4 @@
+use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::vector::Vector3;
 
@@ -10,7 +11,7 @@ pub struct HitRecord {
 
 impl HitRecord {
     pub fn new() -> HitRecord {
-        HitRecord{
+        HitRecord {
             position: Vector3::zero(),
             normal: Vector3::zero(),
             time: 0.0,
@@ -24,7 +25,6 @@ impl HitRecord {
         } else {
             -Vector3(outward_normal.x(), outward_normal.y(), outward_normal.z())
         }
-
     }
 }
 
@@ -34,7 +34,7 @@ pub struct HittableList {
 
 impl HittableList {
     pub fn new() -> HittableList {
-        HittableList{
+        HittableList {
             objects: Vec::new(),
         }
     }
@@ -49,13 +49,13 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, ray: &Ray, ray_t_min: f32, ray_t_max: f32, hit_record: &mut HitRecord) -> bool {
+    fn hit(&self, ray: &Ray, ray_t: Interval, hit_record: &mut HitRecord) -> bool {
         let mut temp_record: HitRecord = HitRecord::new();
         let mut hit_anything: bool = false;
-        let mut closest_so_far = ray_t_max;
+        let mut closest_so_far = ray_t.max;
 
         for object in &self.objects {
-            if object.hit(ray, ray_t_min, closest_so_far, &mut temp_record) {
+            if object.hit(ray, Interval::new(ray_t.min, closest_so_far), &mut temp_record) {
                 hit_anything = true;
                 closest_so_far = temp_record.time;
 
@@ -71,5 +71,5 @@ impl Hittable for HittableList {
 }
 
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, ray_t_min: f32, ray_t_max: f32, hit_record: &mut HitRecord) -> bool;
+    fn hit(&self, ray: &Ray, ray_t: Interval, hit_record: &mut HitRecord) -> bool;
 }
