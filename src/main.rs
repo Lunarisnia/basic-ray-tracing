@@ -21,6 +21,6 @@ fn main() {
     let image_width: i32 = 400;
     let aspect_ratio: f32 = 16.0 / 9.0;
 
-    let mut camera: Camera = Camera::new(image_width, aspect_ratio, 100);
+    let mut camera: Camera = Camera::new(image_width, aspect_ratio, 100, 50);
     camera.render(&world);
 }

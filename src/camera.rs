@@ -1,3 +1,4 @@
+use std::f64::consts::PI;
 use Vector3 as Color;
 
 use crate::hittable::{HitRecord, Hittable, HittableList};
@@ -12,6 +13,7 @@ pub struct Camera {
     aspect_ratio: f32,
     samples_per_pixel: i32,
     pixel_sample_scale: f32,
+    depth_limit: i32,
 
     image_height: i32,
     center: Vector3,
@@ -21,11 +23,12 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(image_width: i32, aspect_ratio: f32, samples_per_pixel: i32) -> Camera {
+    pub fn new(image_width: i32, aspect_ratio: f32, samples_per_pixel: i32, depth_limit: i32) -> Camera {
         Camera {
             image_width,
             aspect_ratio,
             samples_per_pixel,
+            depth_limit,
             pixel_sample_scale: 0.0,
             image_height: 0,
             center: Vector3::zero(),
@@ -77,7 +80,7 @@ impl Camera {
                 let mut pixel_color: Color = Color::zero();
                 for _ in 0..self.samples_per_pixel {
                     let ray: Ray = self.get_ray(i, j);
-                    pixel_color += self.ray_color(&ray, &world);
+                    pixel_color += self.ray_color(&ray, self.depth_limit, &world);
                 }
                 self.write_color(self.pixel_sample_scale * pixel_color);
             }
@@ -100,10 +103,22 @@ impl Camera {
         Vector3(random_zero_one() - 0.5, random_zero_one() - 0.5, 0.0)
     }
 
+    fn linear_to_gamma(&self, linear_component: f32) -> f32 {
+        if linear_component > 0.0 {
+            return linear_component.sqrt();
+        }
+
+        return 0.0;
+    }
+
     fn write_color(&self, color: Color) {
-        let normalized_r: f32 = color.x();
-        let normalized_g: f32 = color.y();
-        let normalized_b: f32 = color.z();
+        let mut normalized_r: f32 = color.x();
+        let mut normalized_g: f32 = color.y();
+        let mut normalized_b: f32 = color.z();
+
+        normalized_r = self.linear_to_gamma(normalized_r);
+        normalized_b = self.linear_to_gamma(normalized_b);
+        normalized_g = self.linear_to_gamma(normalized_g);
 
         let interval: Interval = Interval::new(0.0, 0.999);
         let r: i32 = (255.999 * interval.clamp(normalized_r)) as i32;
@@ -113,11 +128,15 @@ impl Camera {
         println!("{} {} {}", r, g, b);
     }
 
-    pub fn ray_color(&self, ray: &Ray, world: &HittableList) -> Color {
+    pub fn ray_color(&self, ray: &Ray, depth: i32, world: &HittableList) -> Color {
+        if depth <= 0 {
+            return Color::zero();
+        }
+
         let mut hit_record: HitRecord = HitRecord::new();
-        if world.hit(ray, Interval::new(0.0, f32::INFINITY), &mut hit_record) {
-            let reflected_direction: Vector3 = Sphere::random_on_hemisphere(&hit_record.normal);
-            return 0.5 * self.ray_color(&Ray::new(&hit_record.position, &reflected_direction), &world);
+        if world.hit(ray, Interval::new(0.001, f32::INFINITY), &mut hit_record) {
+            let reflected_direction: Vector3 = hit_record.normal + Sphere::random_on_hemisphere(&hit_record.normal);
+            return 0.5 * self.ray_color(&Ray::new(&hit_record.position, &reflected_direction), depth - 1, &world);
             // TODO: STOP HERE AND UNDERSTAND IT BEFORE PROCEEDING TO 9.2
         }
 
